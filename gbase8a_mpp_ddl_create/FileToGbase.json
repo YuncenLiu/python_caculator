@@ -1,0 +1,40 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {
+          "name": "txtfilereader", 
+          "parameter": {
+            "path": ["/Users/xiang/xiang/compile/datax/target/DATAX_TO_MPP_TM_TEST_TABLE__e81c486e_e40a_46a2_95a5_7c82512561ec"],
+            "fieldDelimiter": "\u0001", 
+            "recordDelimiter": "\u001f", 
+            "encoding": "UTF-8",
+            "column": ["*"]
+          }
+        },
+        "writer": {
+          "name": "rdbmswriter",
+          "parameter": {
+            "batchSize": 5000,
+            "memstoreThreshold": "90",
+            "username": "eastusertest",
+            "password": "uoz@a`h#WNk4g^&M",
+            "column": ["*"],
+            "preSql": ["truncate table DATAX_TO_MPP_TM_TEST_TABLE"],
+            "connection": [
+              {
+                "table": ["DATAX_TO_MPP_TM_TEST_TABLE"],
+                "jdbcUrl": "jdbc:gbase://10.4.43.53:5258/eastusertest?failoverEnable=true&hostList=10.4.43.57,10.4.43.61&gclusterId=gc1"
+              }
+            ]
+          }
+        }
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": "1"
+      }
+    }
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "job": {
+    "content": [
+      {
+        "reader": {},
+        "writer": {
+          "name": "txtfilewriter",
+          "parameter": {
+            "path": "/Users/xiang/xiang/compile/datax/target/gbase_source/",
+            "fileName": "",
+            "nullFormat": "",
+            "writeMode": "truncate",
+            "fieldDelimiter": "\u0001",
+            "recordDelimiter": "\u001f"
+          }
+        },
+        "transformer": []
+      }
+    ],
+    "setting": {
+      "speed": {
+        "channel": "1"
+      }
+    }
+  }
+}
