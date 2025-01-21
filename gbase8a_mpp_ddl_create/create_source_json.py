@@ -4,7 +4,7 @@ import json
 import shutil
 
 data_dict = {
-    1: ["1", "100", "**"],
+    1: ["1", "4000", "**"],
     2: ["4", "4000", "******"],
     3: ["3", "4000", "********"],
     4: ["3", "4000", "********"],
@@ -67,8 +67,8 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
                         "table": [ods_table_name]
                     }
                 ],
-                "username": "pim0c3a4d41i",
-                "password": "xRMFMEE6gE5G"
+                "username": "07froutpt691",
+                "password": "mZP4qzTHQtFD"
             }
         }
 

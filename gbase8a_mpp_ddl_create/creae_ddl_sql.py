@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 import shutil
+import re
 
 # 读取 Excel 文件
 def read_excel(file_path):
@@ -53,6 +54,15 @@ def generate_ddl_and_save_to_file(df, output_dir):
         length = row['长度']
         length = f"({length})"
 
+        comment_1 = row['备注']
+        comment_2 = ''
+
+        # 假设 comment_1 可能是空字符串、None 或 NaN
+        if pd.isna(comment_1) or comment_1 == '' or not isinstance(comment_1, str):
+            comment_2 = comment_1  # 如果为空、NaN 或不是字符串，直接保持不变
+        else:
+            comment_2 = comment_1.replace("'", "") if "'" in comment_1 else comment_1
+
         # 判断类型并修改
         data_type = row['类型']
         if data_type.upper() == 'VARCHAR2':
@@ -67,12 +77,16 @@ def generate_ddl_and_save_to_file(df, output_dir):
         elif data_type.upper() == 'DATE':
             data_type = 'DATETIME'
             length = ""
+        elif data_type.upper() == 'CLOB':
+            data_type = 'BLOB'
 
 
 
         # is_nullable = 'NOT NULL' if row['为空约束'] == 'N' else 'DEFAULT NULL'
         # primary_key = 'PRIMARY KEY' if 'P' in str(row['主键约束']) else ''
-        comment = f"COMMENT '{row.get('备注', '')}'" if pd.notna(row.get('备注', '')) else ''
+        # comment = f"COMMENT '{row.get('备注', '')}'" if pd.notna(row.get('备注', '')) else ''
+        comment = f"COMMENT '{comment_2}'" if pd.notna(comment_2) else ''
+
 
         # 创建 DDL 语句
         if table_name not in ddl_statements:
@@ -80,7 +94,16 @@ def generate_ddl_and_save_to_file(df, output_dir):
 
         # ddl_statements[table_name] += f"    {field_name} {data_type}({length}) {is_nullable} {comment},\n"
 
-        ddl_statements[table_name] += f"    {field_name} {data_type}{length} {comment},\n"
+
+        if data_type == 'BLOB':
+            ddl_statements[table_name] += f"    {field_name} {data_type} {comment},\n"
+        else:
+            if length == '(nan)':
+                ddl_statements[table_name] += f"    {field_name} {data_type} {comment},\n"
+            else:
+                ddl_statements[table_name] += f"    {field_name} {data_type}{length} {comment},\n"
+
+
 
     # 将每个表的 DDL 语句整理成一个列表并输出
     for table_name, ddl in ddl_statements.items():
