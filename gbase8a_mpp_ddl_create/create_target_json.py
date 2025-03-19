@@ -53,7 +53,9 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
         schame = group['目标库'].tolist()[0]
         new_table_name = group['目标表'].tolist()[0]
 
-        path = "/Users/xiang/xiang/compile/datax/target/gbase_source/" + schame + "/" + new_table_name
+        # path = "/Users/xiang/xiang/compile/datax/target/gbase_source/" + schame + "/" + new_table_name
+        # path = "/data/datax/datax/source/gbase_source/" + schame + "/" + new_table_name
+        path = "/datasync/source/gbase_source/" + schame + "/" + new_table_name
 
         other_fields = group.drop(columns=['备注'])  # 排除 '字段' 列
         other_fields_info = other_fields.to_dict(orient='records')  # 转为字典格式，每行是一个字典

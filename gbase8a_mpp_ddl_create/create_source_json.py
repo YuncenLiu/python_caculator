@@ -52,6 +52,15 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
     for table_name, group in grouped:
 
         ods_table_name = "ODS." + table_name
+        # ods_table_name = table_name
+
+        # "jdbc:oracle:thin:@10.6.74.181:1522:bidb"
+        # "username": "datamart_pre",
+        # "password": "datamart_pre"
+
+        # "jdbc:oracle:thin:@10.5.2.88:1521:klcpm"
+        # "username": "klcpm_read",
+        # "password": "2cpmread88kl"
 
         # 获取该表的所有字段
         fields = group['字段'].tolist()
@@ -62,13 +71,13 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
                 "connection": [
                     {
                         "jdbcUrl": [
-                            "jdbc:oracle:thin:@term-zz01.klhic.com:9006:bidb"
+                            "jdbc:oracle:thin:@10.6.74.181:1522:bidb"
                         ],
                         "table": [ods_table_name]
                     }
                 ],
-                "username": "07froutpt691",
-                "password": "mZP4qzTHQtFD"
+                "username": "datamart_pre",
+                "password": "datamart_pre"
             }
         }
 
@@ -90,7 +99,15 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
         other_fields = group.drop(columns=['目标表'])  # 排除 '字段' 列
         other_fields_info = other_fields.to_dict(orient='records')  # 转为字典格式，每行是一个字典
 
-        transformer = []
+        transformer = [
+            {
+                "name": "dx_groovy",
+                "parameter": {
+                    "code": "for(int i=0;i<record.getColumnNumber();i++){if(record.getColumn(i).getByteSize()!=0){Column column = record.getColumn(i); def str = column.asString(); def newStr=null; newStr=str.replaceAll(\"[\\r\\n]\",\"\"); record.setColumn(i, new StringColumn(newStr)); };};return record;",
+                    "extraPackage": []
+                }
+            },
+        ]
 
         for col in other_fields_info:
             if col["表名"] == table_name:
@@ -106,7 +123,7 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
                         }
                     }
 
-                    trans["parameter"]["columnIndex"] = column_index
+                    trans["parameter"]["columnIndex"] = column_index - 1
                     trans["parameter"]["paras"] = data_dict[column_type]
                     transformer.append(trans)
 
@@ -115,7 +132,9 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
         data["job"]["content"][0]["transformer"] = transformer
 
         # 修改 writer path
-        new_path = "/Users/xiang/xiang/compile/datax/target/gbase_source/" + schame + "/"
+        # new_path = "/Users/xiang/xiang/compile/datax/target/gbase_source/" + schame + "/"
+        # new_path = "/data/datax/datax/source/gbase_source/" + schame + "/"
+        new_path = "/datasync/source/gbase_source/" + schame + "/"
 
         data["job"]["content"][0]["writer"]["parameter"]["path"] = new_path
 
@@ -130,7 +149,8 @@ def generate_json_and_save_to_file(df, input_json_path, output_dir):
         with open(output_file, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=2)
 
-        print(f"Generated config for table {schame}.{table_name} and saved to {output_file}")
+        # print(f"Generated config for table {schame}.{table_name} and saved to {output_file}")
+        print(f" {output_file}")
 
 # 主函数，执行读取和生成 DDL 语句并保存为文件
 def main():
